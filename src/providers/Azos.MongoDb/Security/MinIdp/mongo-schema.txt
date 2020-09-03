@@ -1,0 +1,36 @@
+﻿
+// TODO: Determine if pwd reset email fields are needed?????
+
+user{
+	_id gdid, ???? add to model?
+	_v timestamp, ???? seems redundant if we already have cd
+	realm long,
+	role string,
+	stat int,
+	cd datetime,
+	sd datetime,
+	ed datetime,
+	name string,
+	desc string,
+	sname string,
+	note string,
+	login [] or do we just store loginId, pwd, loginsd, logined ???? What about password reuse/change logic????
+}
+
+login{
+	id string,
+	pwd string,
+	sd datetime,
+	ed datetime
+}
+
+role{
+	_id gdid, ???? add to model?
+	id string,
+	realm long,
+	desc string,
+	rights blob,
+	sd datetime,
+	ed datetime,
+	note string
+}

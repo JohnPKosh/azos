@@ -30,7 +30,7 @@ namespace Azos.Security.MinIdp
 
 
   /// <summary>
-  /// Sets contract for DTO - data stored in MinIdp system
+  /// Sets contract for user DTO - data stored in MinIdp system
   /// </summary>
   public sealed class MinIdpUserData
   {
@@ -55,6 +55,33 @@ namespace Azos.Security.MinIdp
     public string Role        { get; set; }//tbl.role.id   vchar 25
     public Rights Rights      { get; set; }//tbl_role.rights  blob (256k)
     public string Note        { get; set; }//tbl_user.note  blob (4k)
+
+    // TODO: Determine if pwd reset email fields are needed?????
+  }
+
+  /// <summary>
+  /// Sets contract for child login DTO - data stored in MinIdp system
+  /// </summary>
+  public sealed class MinIdpLoginData
+  {
+    public string LoginId { get; set; }//tbl_login.id    vchar(36)
+    public string LoginPassword { get; set; }//tbl_login.pwd   vchar(2k) -- contains PWD JSON
+    public DateTime? LoginStartUtc { get; set; }//tbl_login.sd
+    public DateTime? LoginEndUtc { get; set; }//tbl_login.ed
+  }
+
+  /// <summary>
+  /// Sets contract for role DTO - data stored in MinIdp system
+  /// </summary>
+  public sealed class MinIdpRoleData
+  {
+    public string RoleId { get; set; }//tbl_role.id    vchar(36)
+    public Atom Realm { get; set; }//tbl_role.realm  vchar(8)
+    public string Description { get; set; }//tbl_role.descr  vchar(96)
+    public Rights Rights { get; set; }//tbl_role.rights  blob (256k)
+    public DateTime StartUtc { get; set; }//tbl_role.sd
+    public DateTime EndUtc { get; set; }//tbl_role.ed
+    public string Note { get; set; }//tbl_role.note  blob (4k)
   }
 
 }
