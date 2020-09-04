@@ -40,128 +40,12 @@ namespace Azos.Data.Access.MongoDb.Security.MinIdp
 
     public const string FLD_LOGIN = "login";
 
-
     public const string FLD_LOGIN_ID = "id";
     public const string FLD_LOGIN_PWD = "pwd";
     public const string FLD_LOGIN_START_DT = "sd";
     public const string FLD_LOGIN_END_DT = "ed";
 
     public const string FLD_ROLE_ID = "id";
-
-
-    //////public static BSONDocument ToBson(Message usr)
-    //////{
-    //////  var doc = new BSONDocument();
-
-    //////  doc.Set(DataDocConverter.GDID_CLRtoBSON(FLD_GDID, usr.Gdid));
-    //////  doc.Set(DataDocConverter.GUID_CLRtoBSON(FLD_GUID, usr.Guid));
-    //////  doc.Set(DataDocConverter.GUID_CLRtoBSON(FLD_RELATED_TO, usr.RelatedTo));
-
-    //////  doc.Set(new BSONInt64Element(FLD_CHANNEL, (long)usr.Channel.ID));
-    //////  doc.Set(new BSONInt64Element(FLD_APP, (long)usr.App.ID));
-    //////  doc.Set(new BSONInt32Element(FLD_TYPE, (int)usr.Type));
-    //////  doc.Set(new BSONInt32Element(FLD_SOURCE, usr.Source));
-    //////  doc.Set(new BSONDateTimeElement(FLD_TIMESTAMP, usr.UTCTimeStamp));
-
-    //////  if (usr.Host.IsNullOrWhiteSpace())
-    //////    doc.Set(new BSONNullElement(FLD_HOST));
-    //////  else
-    //////    doc.Set(new BSONStringElement(FLD_HOST, usr.Host));
-
-    //////  if (usr.From.IsNullOrWhiteSpace())
-    //////    doc.Set(new BSONNullElement(FLD_FROM));
-    //////  else
-    //////    doc.Set(new BSONStringElement(FLD_FROM, usr.From));
-
-    //////  if (usr.Topic.IsNullOrWhiteSpace())
-    //////    doc.Set(new BSONNullElement(FLD_TOPIC));
-    //////  else
-    //////    doc.Set(new BSONStringElement(FLD_TOPIC, usr.Topic));
-
-
-    //////  if (usr.Text.IsNullOrWhiteSpace())
-    //////    doc.Set(new BSONNullElement(FLD_TEXT));
-    //////  else
-    //////    doc.Set(new BSONStringElement(FLD_TEXT, usr.Text));
-
-    //////  if (usr.Parameters.IsNullOrWhiteSpace())
-    //////    doc.Set(new BSONNullElement(FLD_PARAMETERS));
-    //////  else
-    //////    doc.Set(new BSONStringElement(FLD_PARAMETERS, usr.Parameters));
-
-    //////  if (usr.ExceptionData != null)
-    //////    doc.Set(new BSONStringElement(FLD_EXCEPTION, usr.ExceptionData.ToJson(JsonWritingOptions.CompactRowsAsMap)));
-    //////  else
-    //////    doc.Set(new BSONNullElement(FLD_EXCEPTION));
-
-    //////  var ad = ArchiveConventions.DecodeArchiveDimensionsMap(usr);
-    //////  if (ad == null)
-    //////  {
-    //////    doc.Set(new BSONNullElement(FLD_AD));
-    //////  }
-    //////  else
-    //////  {
-    //////    var adDoc = ad.ToBson();
-    //////    doc.Set(new BSONDocumentElement(FLD_AD, adDoc));
-    //////  }
-
-    //////  return doc;
-    //////}
-
-    public static MinIdpUserData UserFromBson(BSONDocument bson)
-    {
-      var usr = new MinIdpUserData();
-
-      //if (bson[FLD_GDID] is BSONBinaryElement binGdid) usr.Gdid = DataDocConverter.GDID_BSONtoCLR(binGdid);
-
-      if (bson[FLD_SYSID] is BSONInt64Element sysId) usr.SysId = (ulong)sysId.Value;
-      if (bson[FLD_REALM] is BSONInt64Element binRealm) usr.Realm = new Atom((ulong)binRealm.Value); // replace with target realm by connection context
-      if (bson[FLD_ROLE] is BSONStringElement role) usr.Role = role.Value;
-      if (bson[FLD_STATUS] is BSONInt32Element stat) usr.Status = (UserStatus)stat.Value;
-
-      if (bson[FLD_CREATE_DT] is BSONDateTimeElement cd) usr.CreateUtc = cd.Value;
-      if (bson[FLD_START_DT] is BSONDateTimeElement sd) usr.StartUtc = sd.Value;
-      if (bson[FLD_END_DT] is BSONDateTimeElement ed) usr.EndUtc = ed.Value;
-
-      if (bson[FLD_NAME] is BSONStringElement name) usr.Name = name.Value;
-      if (bson[FLD_DESC] is BSONStringElement desc) usr.Description = desc.Value;
-      if (bson[FLD_SNAME] is BSONStringElement sname) usr.ScreenName = sname.Value;
-      if (bson[FLD_NOTE] is BSONStringElement note) usr.Note = note.Value;
-
-      var logins = new List<MinIdpLoginData>();
-      if (bson[FLD_LOGIN] is BSONArrayElement loginArr)
-      {
-        foreach (BSONElement l in loginArr.Value)
-        {
-          if(l is BSONDocumentElement elm)
-          {
-            MinIdpLoginData login = LoginFromBson(elm.Value);
-            logins.Add(login);
-          }
-        }
-      }
-      // Use App.TimeSource instead
-      var activeLogin = logins.FirstOrDefault(x => x.LoginStartUtc >= DateTime.UtcNow && x.LoginEndUtc <= DateTime.UtcNow);
-
-      if(activeLogin == null) return null;  // may need additional flag if we want to still return without login info
-
-      // ELSE if there is an active login
-      usr.LoginId = activeLogin.LoginId;
-      usr.LoginPassword = activeLogin.LoginPassword;
-      usr.LoginStartUtc = activeLogin.LoginStartUtc;
-      usr.LoginEndUtc = activeLogin.LoginEndUtc;
-      return usr;
-    }
-
-    private static MinIdpLoginData LoginFromBson(BSONDocument bson)
-    {
-      var login = new MinIdpLoginData();
-      if (bson[FLD_LOGIN_ID] is BSONStringElement loginId) login.LoginId = loginId.Value;
-      if (bson[FLD_LOGIN_PWD] is BSONStringElement loginPwd) login.LoginPassword = loginPwd.Value;
-      if (bson[FLD_LOGIN_START_DT] is BSONDateTimeElement loginSd) login.LoginStartUtc = loginSd.Value;
-      if (bson[FLD_LOGIN_END_DT] is BSONDateTimeElement loginEd) login.LoginEndUtc = loginEd.Value;
-      return login;
-    }
 
     public static MinIdpRoleData RoleFromBson(BSONDocument bson)
     {
@@ -179,6 +63,143 @@ namespace Azos.Data.Access.MongoDb.Security.MinIdp
       if (bson[FLD_NOTE] is BSONStringElement note) role.Note = note.Value;
 
       return role;
+    }
+
+    public static BSONDocument RoleToBson(MinIdpRoleData role)
+    {
+      var doc = new BSONDocument();
+
+      // where will validation happen???
+
+      doc.Set(new BSONStringElement(FLD_ROLE_ID, role.RoleId));
+      doc.Set(new BSONInt64Element(FLD_REALM, (long)role.Realm.ID));  // replace with target realm by connection context
+      if (role.Description.IsNullOrWhiteSpace())
+        doc.Set(new BSONNullElement(FLD_DESC));
+      else
+        doc.Set(new BSONStringElement(FLD_DESC, role.Description));
+
+      doc.Set(new BSONStringElement(FLD_RIGHTS, role.Rights.AsLaconicConfig().AsString()));
+
+      doc.Set(new BSONDateTimeElement(FLD_START_DT, role.StartUtc));
+      doc.Set(new BSONDateTimeElement(FLD_END_DT, role.EndUtc));
+      if (role.Note.IsNullOrWhiteSpace())
+        doc.Set(new BSONNullElement(FLD_NOTE));
+      else
+        doc.Set(new BSONStringElement(FLD_NOTE, role.Note));
+
+      return doc;
+    }
+
+    public static MinIdpUserData UserFromBson(BSONDocument bson)
+    {
+      var usr = new MinIdpUserData();
+
+      //if (bson[FLD_GDID] is BSONBinaryElement binGdid) usr.Gdid = DataDocConverter.GDID_BSONtoCLR(binGdid);
+      if (bson[FLD_SYSID] is BSONInt64Element sysId) usr.SysId = (ulong)sysId.Value;
+      if (bson[FLD_REALM] is BSONInt64Element binRealm) usr.Realm = new Atom((ulong)binRealm.Value); // replace with target realm by connection context
+      if (bson[FLD_ROLE] is BSONStringElement role) usr.Role = role.Value;
+      if (bson[FLD_STATUS] is BSONInt32Element stat) usr.Status = (UserStatus)stat.Value;
+
+      if (bson[FLD_CREATE_DT] is BSONDateTimeElement cd) usr.CreateUtc = cd.Value;
+      if (bson[FLD_START_DT] is BSONDateTimeElement sd) usr.StartUtc = sd.Value;
+      if (bson[FLD_END_DT] is BSONDateTimeElement ed) usr.EndUtc = ed.Value;
+
+      if (bson[FLD_NAME] is BSONStringElement name) usr.Name = name.Value;
+      if (bson[FLD_DESC] is BSONStringElement desc) usr.Description = desc.Value;
+      if (bson[FLD_SNAME] is BSONStringElement sname) usr.ScreenName = sname.Value;
+      if (bson[FLD_NOTE] is BSONStringElement note) usr.Note = note.Value;
+
+      var logins = new List<MinIdpLoginData>();   // ***Complex model example***
+      if (bson[FLD_LOGIN] is BSONArrayElement loginArr)
+      {
+        foreach (BSONElement l in loginArr.Value)
+        {
+          if(l is BSONDocumentElement elm)
+          {
+            MinIdpLoginData login = LoginFromBson(elm.Value);
+            logins.Add(login);
+          }
+        }
+      }
+      // Use App.TimeSource instead
+      var activeLogin = logins.FirstOrDefault(x => x.LoginStartUtc >= DateTime.UtcNow && x.LoginEndUtc <= DateTime.UtcNow);
+      if(activeLogin == null) return null;  // may need additional flag if we want to still return without login info
+
+      // ELSE if there is an active login
+      usr.LoginId = activeLogin.LoginId;
+      usr.LoginPassword = activeLogin.LoginPassword;
+      usr.LoginStartUtc = activeLogin.LoginStartUtc;
+      usr.LoginEndUtc = activeLogin.LoginEndUtc;
+      return usr;
+    }
+
+    public static BSONDocument UserToBson(MinIdpUserData usr)
+    {
+      var doc = new BSONDocument();
+
+      // where will validation happen???
+      doc.Set(new BSONInt64Element(FLD_SYSID, (long)usr.SysId));
+      doc.Set(new BSONInt64Element(FLD_REALM, (long)usr.Realm.ID));  // replace with target realm by connection context
+      doc.Set(new BSONStringElement(FLD_ROLE, usr.Role));
+      doc.Set(new BSONInt32Element(FLD_STATUS, (int)usr.Status));
+
+      doc.Set(new BSONDateTimeElement(FLD_CREATE_DT, usr.CreateUtc));
+      doc.Set(new BSONDateTimeElement(FLD_START_DT, usr.StartUtc));
+      doc.Set(new BSONDateTimeElement(FLD_END_DT, usr.EndUtc));
+
+      doc.Set(new BSONStringElement(FLD_NAME, usr.Name)); // should not be null
+
+      if (usr.Description.IsNullOrWhiteSpace())
+        doc.Set(new BSONNullElement(FLD_DESC));
+      else
+        doc.Set(new BSONStringElement(FLD_DESC, usr.Description));
+
+      doc.Set(new BSONStringElement(FLD_SNAME, usr.ScreenName)); // should not be null
+
+      if (usr.Note.IsNullOrWhiteSpace())
+        doc.Set(new BSONNullElement(FLD_NOTE));
+      else
+        doc.Set(new BSONStringElement(FLD_NOTE, usr.Note));
+
+      // Handle login data here how????  ***Flattened model example***
+      doc.Set(new BSONStringElement(FLD_LOGIN_ID, usr.LoginId));
+      doc.Set(new BSONStringElement(FLD_LOGIN_PWD, usr.LoginPassword));
+      if (usr.LoginStartUtc.HasValue)
+        doc.Set(new BSONDateTimeElement(FLD_LOGIN_START_DT, usr.LoginStartUtc.Value));
+      // ELSE is needed correct?
+      if (usr.LoginEndUtc.HasValue)
+        doc.Set(new BSONDateTimeElement(FLD_LOGIN_END_DT, usr.LoginEndUtc.Value));
+      // ELSE is needed correct?
+
+      return doc;
+    }
+
+    public static MinIdpLoginData LoginFromBson(BSONDocument bson)
+    {
+      var login = new MinIdpLoginData();
+      if (bson[FLD_LOGIN_ID] is BSONStringElement loginId) login.LoginId = loginId.Value;
+      if (bson[FLD_LOGIN_PWD] is BSONStringElement loginPwd) login.LoginPassword = loginPwd.Value;
+      if (bson[FLD_LOGIN_START_DT] is BSONDateTimeElement loginSd) login.LoginStartUtc = loginSd.Value;
+      if (bson[FLD_LOGIN_END_DT] is BSONDateTimeElement loginEd) login.LoginEndUtc = loginEd.Value;
+      return login;
+    }
+
+    public static BSONDocument LoginToBson(MinIdpLoginData login)
+    {
+      var doc = new BSONDocument();
+
+      // where will validation happen???
+
+      doc.Set(new BSONStringElement(FLD_LOGIN_ID, login.LoginId));
+      doc.Set(new BSONStringElement(FLD_LOGIN_PWD, login.LoginPassword));
+      if(login.LoginStartUtc.HasValue)
+        doc.Set(new BSONDateTimeElement(FLD_LOGIN_START_DT, login.LoginStartUtc.Value));
+      // ELSE is needed correct?
+      if (login.LoginEndUtc.HasValue)
+        doc.Set(new BSONDateTimeElement(FLD_LOGIN_END_DT, login.LoginEndUtc.Value));
+      // ELSE is needed correct?
+
+      return doc;
     }
 
   }
