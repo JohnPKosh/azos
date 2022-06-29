@@ -56,14 +56,14 @@ namespace Azos.Tests.Nub.Time
       Aver.AreEqual(1440, got.Spans.First().DurationMinutes);
     }
 
-    //[Run]
-    //[Throws(ExceptionType = typeof(TimeException))]
-    //public void Day_Zero1MinTo24Hour1Min()
-    //{
-    //  var got = new HourList("0:01-24:01");
-    //  var span = got.Spans.First();
-    //  got.Spans.Count().See();
-    //}
+    [Run]
+    [Throws(ExceptionType = typeof(TimeException))]
+    public void Day_Zero1MinTo24Hour1Min()
+    {
+      var got = new HourList("0:01-24:01");
+      var span = got.Spans.First();
+      got.Spans.Count().See();
+    }
 
     [Run]
     public void Day_ZeroTo23Hour()
@@ -78,13 +78,13 @@ namespace Azos.Tests.Nub.Time
       Aver.AreEqual(1380, got.Spans.First().DurationMinutes);
     }
 
-    //[Run]
-    //[Throws(ExceptionType =typeof(TimeException))]
-    //public void Throw_OnOverlap()
-    //{
-    //  var got = new HourList("22:66-23");
-    //  Aver.AreEqual(1, got.Spans.Count());
-    //}
+    [Run]
+    [Throws(ExceptionType = typeof(TimeException))]
+    public void Throw_OnOverlap()
+    {
+      var got = new HourList("22:66-23");
+      Aver.AreEqual(1, got.Spans.Count());
+    }
 
 
     [Run]
