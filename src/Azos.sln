@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27130.2026
+# Visual Studio Version 17
+VisualStudioVersion = 17.2.32526.322
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Azos", "Azos\Azos.csproj", "{C2BF5275-C8C2-46CC-86C7-A83A75C2BE0D}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -21,7 +21,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Azos.Platform.NetFramework"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C2217C23-C12B-4CE7-B8B6-7222662EB16A}"
 	ProjectSection(SolutionItems) = preProject
-		____GlobalWarningSuppressions.cs = ____GlobalWarningSuppressions.cs
 		Directory.Build.props = Directory.Build.props
 		documentation-index.md = documentation-index.md
 		naming-conventions.md = naming-conventions.md
@@ -30,6 +29,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		runtimes.md = runtimes.md
 		todo-stickers.md = todo-stickers.md
 		truisms.md = truisms.md
+		____GlobalWarningSuppressions.cs = ____GlobalWarningSuppressions.cs
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "buildinfo", "runtimes\netf\buildinfo\buildinfo.csproj", "{AB869DBB-623B-4A34-8D06-D11FAEE2B8F1}"
@@ -97,6 +97,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "sky", "runtimes\netf\sky\sky.csproj", "{8253A489-1524-4E08-B155-D1A3F83CD031}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "sky", "runtimes\core\sky\sky.csproj", "{4738C14F-1153-44F6-977B-B82750333E7E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "poc", "poc", "{A72C793A-235E-46DD-AEEB-D3244489D6F7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "kweb", "poc\kweb\kweb.csproj", "{BAF5EBCC-8310-4F1E-BDBB-D86D9F7898FA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -224,6 +228,10 @@ Global
 		{4738C14F-1153-44F6-977B-B82750333E7E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4738C14F-1153-44F6-977B-B82750333E7E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4738C14F-1153-44F6-977B-B82750333E7E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BAF5EBCC-8310-4F1E-BDBB-D86D9F7898FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BAF5EBCC-8310-4F1E-BDBB-D86D9F7898FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BAF5EBCC-8310-4F1E-BDBB-D86D9F7898FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BAF5EBCC-8310-4F1E-BDBB-D86D9F7898FA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -255,6 +263,7 @@ Global
 		{FCC9B471-5847-4EFC-8167-9853B31DF511} = {608A6011-035A-4E1C-A1EB-29F91960A5BD}
 		{8253A489-1524-4E08-B155-D1A3F83CD031} = {F572F5AC-8BDE-4D36-BE8A-ED42299C576F}
 		{4738C14F-1153-44F6-977B-B82750333E7E} = {ABC662BC-C8F5-4D1F-A411-E45DCFC5417E}
+		{BAF5EBCC-8310-4F1E-BDBB-D86D9F7898FA} = {A72C793A-235E-46DD-AEEB-D3244489D6F7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {75EF590C-FE75-45E7-B941-B225EF484F5F}
