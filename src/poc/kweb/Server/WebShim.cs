@@ -11,10 +11,10 @@ public class WebShim
   /// <summary>
   /// Creates and Builds a Kestral WebApplication that proxies logic through existing Azos web logic based on the supplied args and configuration
   /// </summary>
-  public WebApplication BuildWebApplication(string[] args)
+  public WebApplication BuildWebApplication(string[] args, WebShimOptions options)
   {
-    var builder = getBuilder(args);
-    builder.WebHost.ConfigureKestrel(loadKestrelConfig()); // TODO: create options model to pass as parameter to LoadKestrelConfig
+    var builder = getBuilder(args, options);
+    builder.WebHost.ConfigureKestrel(loadKestrelConfig(options)); // TODO: create options model to pass as parameter to LoadKestrelConfig
     var app = builder.Build();
 
     app.UseRouting();
@@ -31,45 +31,80 @@ public class WebShim
 
   #region Private Methods
 
-  private WebApplicationBuilder getBuilder(string[] args)
+  // **** TODO: Replace all of the hardcoded defaults with configuration properties and/or .consts ****
+
+  private WebApplicationBuilder getBuilder(string[] args, WebShimOptions options)
   {
     var builder = WebApplication.CreateBuilder(new WebApplicationOptions
     {
-      Args = args,
+      Args = options.AppOptions.Args ?? args,
       // **** TODO: Add IConfig and load settings below from configuration ****
-      ApplicationName = typeof(Program).Assembly.FullName,
-      ContentRootPath = Directory.GetCurrentDirectory(),
-      EnvironmentName = Environments.Staging,
-      WebRootPath = "wwwroot"
+      ApplicationName = options.AppOptions.ApplicationName ?? typeof(Program).Assembly.FullName,
+      ContentRootPath = options.AppOptions.ContentRootPath ?? Directory.GetCurrentDirectory(),
+      EnvironmentName = options.AppOptions.EnvironmentName ?? Environments.Production,
+      WebRootPath = options.AppOptions.WebRootPath ?? "wwwroot"
     });
     return builder;
   }
 
-  private Action<KestrelServerOptions> loadKestrelConfig() // **** TODO: create options model to pass as parameter ****
+  private Action<KestrelServerOptions> loadKestrelConfig(WebShimOptions options) // **** TODO: create options model to pass as parameter ****
   {
     return serverOptions =>
     {
-      serverOptions.Limits.MaxConcurrentConnections = 1000;
-      serverOptions.Limits.MaxConcurrentUpgradedConnections = 1000;
-      serverOptions.Limits.MaxRequestBodySize = 100 * 1024 * 1024;
-      serverOptions.Limits.MinRequestBodyDataRate = new MinDataRate(bytesPerSecond: 100, gracePeriod: TimeSpan.FromSeconds(10));
-      serverOptions.Limits.MinResponseDataRate = new MinDataRate(bytesPerSecond: 100, gracePeriod: TimeSpan.FromSeconds(10));
+      serverOptions.Limits.MaxConcurrentConnections = options.KestrelOptions.Limits.MaxConcurrentConnections ?? 1000;
+      serverOptions.Limits.MaxConcurrentUpgradedConnections = options.KestrelOptions.Limits.MaxConcurrentUpgradedConnections ?? 1000;
+      serverOptions.Limits.MaxRequestBodySize = options.KestrelOptions.Limits.MaxRequestBodySize ?? 100 * 1024 * 1024;
+      serverOptions.Limits.MinRequestBodyDataRate = options.KestrelOptions.Limits.MinRequestBodyDataRate ?? new MinDataRate(bytesPerSecond: 100, gracePeriod: TimeSpan.FromSeconds(10));
+      serverOptions.Limits.MinResponseDataRate = options.KestrelOptions.Limits.MinResponseDataRate ?? new MinDataRate(bytesPerSecond: 100, gracePeriod: TimeSpan.FromSeconds(10));
+
+      serverOptions.Limits.KeepAliveTimeout = options.KestrelOptions.Limits.KeepAliveTimeout; // Default is 30 seconds do we want to set default, min, and max?
+      serverOptions.Limits.RequestHeadersTimeout = options.KestrelOptions.Limits.RequestHeadersTimeout; // Default is 30 seconds do we want to set default, min, and max?
 
       // HTTP
-      serverOptions.Listen(IPAddress.Loopback, 5105);
+      var http = options.HttpListener;
+      if (http != null)
+      {
+        if(http.Options == null) serverOptions.Listen(http.Address ?? IPAddress.Loopback, http.Port ?? 5105);
+        else serverOptions.Listen(http.Address ?? IPAddress.Loopback, http.Port ?? 5105, http.Options);
+      }
 
       // HTTPS
-      serverOptions.Listen(IPAddress.Loopback, 5106,
+      var https = options.HttpsListener;
+      if (https != null)
+      {
+        if (https.Options == null) serverOptions.Listen(
+          https.Address ?? IPAddress.Loopback,
+          https.Port ?? 5105,
           listenOptions =>
-          {
-            listenOptions.Protocols = HttpProtocols.Http2;
-            listenOptions.UseHttps("localhost.pfx", "YourSecurePassword");
-          });
-
-      serverOptions.Limits.KeepAliveTimeout = TimeSpan.FromMinutes(5);
-      serverOptions.Limits.RequestHeadersTimeout = TimeSpan.FromMinutes(1);
+            {
+              listenOptions.Protocols = HttpProtocols.Http2;
+              listenOptions.UseHttps("localhost.pfx", "YourSecurePassword");
+            });
+        else serverOptions.Listen(https.Address ?? IPAddress.Loopback, https.Port ?? 5105, https.Options);
+      }
     };
   }
 
   #endregion
+}
+
+
+public class WebShimOptions
+{
+  public WebApplicationOptions AppOptions { get; set; } = new WebApplicationOptions();
+
+  public KestrelServerOptions KestrelOptions { get; set; } = new KestrelServerOptions();
+
+  public WebShimListener? HttpListener { get; set; }
+
+  public WebShimListener? HttpsListener { get; set; }
+}
+
+public class WebShimListener
+{
+  public IPAddress? Address { get; set; }
+
+  public int? Port { get; set; }
+
+  public Action<ListenOptions>? Options { get; set; }
 }

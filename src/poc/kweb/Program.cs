@@ -6,20 +6,29 @@ public class Program
 {
   public async static Task Main(string[] args)
   {
-    //var app = new WebShim().BuildWebApplication(args);
-    //app.Run();
+    // Create and Start First WebApplication
+    var app1Options = new WebShimOptions();
+    var app1 = await BuildAndStartAppAsync(args, app1Options).ConfigureAwait(false);
 
-    var app1 = await BuildAndStartAppAsync(args).ConfigureAwait(false);
-    //var app2 = await BuildAndStartAppAsync(args).ConfigureAwait(false);
+    // Create and Start Second WebApplication
+    var app2Options = new WebShimOptions()
+    {
+      HttpListener = new WebShimListener { Port = 6200},
+      HttpsListener = new WebShimListener { Port = 6201}
+    };
+    var app2 = await BuildAndStartAppAsync(args, app2Options).ConfigureAwait(false);
 
+    // Wait around to exit
     Console.ReadKey(true);
+
+    // Stop Web App
     app1.StopAsync().Wait();
-    //app2.StopAsync().Wait();
+    app2.StopAsync().Wait();
   }
 
-  public async static Task<WebApplication> BuildAndStartAppAsync(string[] args)
+  public async static Task<WebApplication> BuildAndStartAppAsync(string[] args, WebShimOptions options)
   {
-    var app = new WebShim().BuildWebApplication(args);
+    var app = new WebShim().BuildWebApplication(args, options);
     await app.StartAsync().ConfigureAwait(false);
     return app;
   }
