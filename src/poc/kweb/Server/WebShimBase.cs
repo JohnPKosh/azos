@@ -1,48 +1,18 @@
-﻿using kweb.Models;
+﻿using System.Net;
+
+using kweb.Models;
 
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 
-using System.Net;
-
 namespace kweb.Server;
 
-/// <summary>
-/// The main Kestrel WebApplication ***ENDPOINT ROUTING*** catch-all logic that can bootstrap and proxy the logic to Azos.Wave
-/// </summary>
-public class WebShimEndpointRouting
+public class WebShimBase
 {
-  /// <summary>
-  /// Creates and Builds a Kestral WebApplication that proxies logic through existing Azos web logic based on the supplied args and configuration
-  /// </summary>
-  public WebApplication BuildWebApplication(string[] args, WebShimOptions options)
-  {
-    var builder = getBuilder(args, options);
-    builder.WebHost.ConfigureKestrel(loadKestrelConfig(options)); // TODO: create options model to pass as parameter to LoadKestrelConfig
-    var app = builder.Build();
 
-    app.UseRouting();
-    app.UseEndpoints(endpoints =>
-    {
-      endpoints.Map("{**slug}", context =>
-      {
-        // **** TODO: Proxy Middleware RequestDelegate logic to Azos here ****
-        return context.Response.WriteAsync(context.Request.QueryString.ToString());
-      });
-
-      endpoints.Map("/sysinfo", context =>
-      {
-        // **** TODO: Add System Info here ****
-        return context.Response.WriteAsync("sysinfo page goes here");
-      });
-    });
-    return app;
-  }
-
-  #region Private Methods
 
   // **** TODO: Replace all of the hardcoded defaults with configuration properties and/or .consts ****
 
-  private WebApplicationBuilder getBuilder(string[] args, WebShimOptions options)
+  protected WebApplicationBuilder getBuilder(string[] args, WebBuilderOptions options)
   {
     var builder = WebApplication.CreateBuilder(new WebApplicationOptions
     {
@@ -56,7 +26,7 @@ public class WebShimEndpointRouting
     return builder;
   }
 
-  private Action<KestrelServerOptions> loadKestrelConfig(WebShimOptions options) // **** TODO: create options model to pass as parameter ****
+  protected Action<KestrelServerOptions> loadKestrelConfig(WebBuilderOptions options) // **** TODO: create options model to pass as parameter ****
   {
     return serverOptions =>
     {
@@ -73,7 +43,7 @@ public class WebShimEndpointRouting
       var http = options.HttpListener;
       if (http != null)
       {
-        if(http.Options == null) serverOptions.Listen(http.Address ?? IPAddress.Loopback, http.Port ?? 5105);
+        if (http.Options == null) serverOptions.Listen(http.Address ?? IPAddress.Loopback, http.Port ?? 5105);
         else serverOptions.Listen(http.Address ?? IPAddress.Loopback, http.Port ?? 5105, http.Options);
       }
 
@@ -93,7 +63,4 @@ public class WebShimEndpointRouting
       }
     };
   }
-
-  #endregion
 }
-

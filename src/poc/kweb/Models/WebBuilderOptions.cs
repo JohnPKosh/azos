@@ -3,13 +3,13 @@ using Microsoft.AspNetCore.Server.Kestrel.Core;
 
 namespace kweb.Models;
 
-public class WebShimOptions
+public class WebBuilderOptions
 {
   public WebApplicationOptions AppOptions { get; set; } = new WebApplicationOptions();
 
   public KestrelServerOptions KestrelOptions { get; set; } = new KestrelServerOptions();
 
-  public WebShimListener? HttpListener { get; set; }
+  public WebListenerOptions? HttpListener { get; set; }
 
-  public WebShimListener? HttpsListener { get; set; }
+  public WebListenerOptions? HttpsListener { get; set; }
 }

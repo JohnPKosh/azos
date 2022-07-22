@@ -5,7 +5,7 @@ using System.Net;
 
 namespace kweb.Models;
 
-public class WebShimListener
+public class WebListenerOptions
 {
   public IPAddress? Address { get; set; }
 

@@ -7,35 +7,43 @@ public class Program
 {
   public async static Task Main(string[] args)
   {
-    // Create and Start First WebApplication
-    var app1Options = new WebShimOptions();
-    var app1 = await BuildAndStartAppAsync(args, app1Options).ConfigureAwait(false);
+    // Create and Start *** MIDDLEWARE *** WebApplication
+    var app1Options = new WebBuilderOptions();
+    var app1 = await BuildAndStartApp_Middleware_Async(args, app1Options).ConfigureAwait(false);
 
-    // Create and Start Second WebApplication
-    var app2Options = new WebShimOptions()
+
+    // Create and Start an *** ENDPOINT ROUTING *** WebApplication
+    var app2Options = new WebBuilderOptions()
     {
-      HttpListener = new WebShimListener { Port = 6200},
-      HttpsListener = new WebShimListener { Port = 6201}
+      HttpListener = new WebListenerOptions { Port = 6200},
+      HttpsListener = new WebListenerOptions { Port = 6201}
     };
-    var app2 = await BuildAndStartAppAsync(args, app2Options).ConfigureAwait(false);
+    var app2 = await BuildAndStartApp_EndpointRouting_Async(args, app2Options).ConfigureAwait(false);
 
-    // Wait around to exit
+    // Wait around for any key to exit
     Console.ReadKey(true);
 
     // Stop Web App
     app1.StopAsync().Wait();
     app2.StopAsync().Wait();
-
-    //app1.Run(async context =>
-    //{
-    //  await context.Response.WriteAsync("Hello Dear Readers!");
-    //});
   }
 
-  public async static Task<WebApplication> BuildAndStartAppAsync(string[] args, WebShimOptions options)
+  #region Private Methods
+
+  private async static Task<WebApplication> BuildAndStartApp_Middleware_Async(string[] args, WebBuilderOptions options)
   {
-    var app = new WebShim().BuildWebApplication(args, options);
+    var app = new WebShim_Middleware().BuildWebApplication(args, options);
     await app.StartAsync().ConfigureAwait(false);
     return app;
   }
+
+
+  private async static Task<WebApplication> BuildAndStartApp_EndpointRouting_Async(string[] args, WebBuilderOptions options)
+  {
+    var app = new WebShim_EndpointRouting().BuildWebApplication(args, options);
+    await app.StartAsync().ConfigureAwait(false);
+    return app;
+  }
+
+  #endregion
 }
