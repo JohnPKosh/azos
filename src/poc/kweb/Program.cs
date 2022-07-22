@@ -1,3 +1,4 @@
+using kweb.Models;
 using kweb.Server;
 
 namespace kweb;
@@ -24,6 +25,11 @@ public class Program
     // Stop Web App
     app1.StopAsync().Wait();
     app2.StopAsync().Wait();
+
+    //app1.Run(async context =>
+    //{
+    //  await context.Response.WriteAsync("Hello Dear Readers!");
+    //});
   }
 
   public async static Task<WebApplication> BuildAndStartAppAsync(string[] args, WebShimOptions options)

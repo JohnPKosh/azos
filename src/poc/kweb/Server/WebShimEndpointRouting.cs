@@ -7,9 +7,9 @@ using System.Net;
 namespace kweb.Server;
 
 /// <summary>
-/// The main Kestrel WebApplication catch-all logic that can bootstrap and proxy the logic to Azos.Wave
+/// The main Kestrel WebApplication ***ENDPOINT ROUTING*** catch-all logic that can bootstrap and proxy the logic to Azos.Wave
 /// </summary>
-public class WebShim
+public class WebShimEndpointRouting
 {
   /// <summary>
   /// Creates and Builds a Kestral WebApplication that proxies logic through existing Azos web logic based on the supplied args and configuration
@@ -96,3 +96,4 @@ public class WebShim
 
   #endregion
 }
+
