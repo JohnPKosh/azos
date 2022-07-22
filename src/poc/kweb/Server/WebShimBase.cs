@@ -1,8 +1,6 @@
 ﻿using System.Net;
-
-using kweb.Models;
-
 using Microsoft.AspNetCore.Server.Kestrel.Core;
+using kweb.Models;
 
 namespace kweb.Server;
 
@@ -35,6 +33,10 @@ public class WebShimBase
 
   #region Protected
 
+  /// <summary>
+  /// Method that uses the WebBuilderOptions.AppOptions to initialize
+  /// a WebApplicationBuilder used for building a WebApplication
+  /// </summary>
   protected WebApplicationBuilder GetBuilder(string[] args, WebBuilderOptions options)
   {
     var builder = WebApplication.CreateBuilder(new WebApplicationOptions
@@ -50,6 +52,10 @@ public class WebShimBase
     return builder;
   }
 
+  /// <summary>
+  /// Method used to create KestralServerOptions that is called when
+  /// invoking the WebApplicationBuilder.WebHost.ConfigureKestrel method
+  /// </summary>
   protected Action<KestrelServerOptions> LoadKestrelConfig(WebBuilderOptions options) // **** TODO: create options model to pass as parameter ****
   {
     return serverOptions =>

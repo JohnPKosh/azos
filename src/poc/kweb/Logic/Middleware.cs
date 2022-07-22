@@ -1,5 +1,8 @@
 ﻿namespace kweb.Logic;
 
+/// <summary>
+/// Custom Middleware extension methods (e.g. "UseWave")
+/// </summary>
 public static class MiddlewareExtensions
 {
   /// <summary>
