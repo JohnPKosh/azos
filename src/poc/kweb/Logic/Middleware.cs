@@ -1,7 +1,4 @@
-﻿
-using static kweb.Server.WebShim_Middleware;
-
-namespace kweb.Logic;
+﻿namespace kweb.Logic;
 
 public static class MiddlewareExtensions
 {
