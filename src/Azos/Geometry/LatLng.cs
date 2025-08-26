@@ -43,16 +43,16 @@ namespace Azos.Geometry
       m_Name = cfg.NonNull(nameof(cfg)).ValOf("name");
       m_Lat = 0d;
       m_Lng = 0d;
-      Lat = cfg.Of("lat").ValueAsDouble();
-      Lng = cfg.Of("lng").ValueAsDouble();
+      Lat = parseDeg(cfg.Of("lat").Value);
+      Lng = parseDeg(cfg.Of("lng").Value);
     }
 
     public ConfigSectionNode PersistConfiguration(ConfigSectionNode parentNode, string name)
     {
       var result = parentNode.NonEmpty(nameof(parentNode)).AddChildNode(name);
-      result.AddAttributeNode("name", Name);
-      result.AddAttributeNode("lat", Lat);
-      result.AddAttributeNode("lng", Lng);
+      result.AddAttributeNode("name", m_Name);
+      result.AddAttributeNode("lat", ComponentToString(Lat));
+      result.AddAttributeNode("lng", ComponentToString(Lng));
       return result;
     }
 
@@ -151,7 +151,7 @@ namespace Azos.Geometry
     /// <summary>
     /// Converts a coordinate component (lat or lng) into standard degree/minute/second string
     /// </summary>
-    public string ComponentToString(double degVal)
+    public static string ComponentToString(double degVal)
     {
       var d = (int)degVal;
       degVal = Math.Abs(degVal-d) * 60d;
@@ -165,9 +165,18 @@ namespace Azos.Geometry
 
     public override int GetHashCode() => m_Lat.GetHashCode() ^ m_Lng.GetHashCode();
 
-    public bool Equals(LatLng other) => this.m_Lat == other.m_Lat &&
-                                        this.m_Lng == other.m_Lng &&
-                                        this.m_Name == other.m_Name;
+    /// <summary>
+    /// Performs exact double Lat/Lng pair comparison, while Equals(other) performs rounded-to-second precision comparison
+    /// </summary>
+    public bool ExactlyEquals(LatLng other) => this.m_Lat == other.m_Lat &&
+                                                this.m_Lng == other.m_Lng &&
+                                                this.m_Name == other.m_Name;
+
+    //The equality test is performed in the confines of Degree/Min/Sec precion specifier which is
+    //about 1 arcsecond (32 meters at equator) precision
+    public bool Equals(LatLng other) => this.m_Name == other.m_Name &&
+                                         ComponentToString(this.Lat) == ComponentToString(other.Lat) &&
+                                         ComponentToString(this.Lng) == ComponentToString(other.Lng);
 
     public override bool Equals(object obj) => obj is LatLng ll ? this.Equals(ll) : false;
 
@@ -177,6 +186,8 @@ namespace Azos.Geometry
 
     private double parseDeg(string val)
     {
+      if (val.IsNullOrWhiteSpace()) return 0d;
+
       if (val.Contains('°'))
       {
         var ideg = val.IndexOf('°');
@@ -232,8 +243,16 @@ namespace Azos.Geometry
 
     void IJsonWritable.WriteAsJson(TextWriter wri, int nestingLevel, JsonWritingOptions options)
     {
-      JsonWriter.WriteMap(wri, nestingLevel, options, new DictionaryEntry("name", m_Name),
-                                                      new DictionaryEntry("location", "{0}, {1}".Args(ComponentToString(Lat), ComponentToString(Lng))));
+      if (options.Purpose == JsonSerializationPurpose.Marshalling)
+      {
+        JsonWriter.WriteMap(wri, nestingLevel, options, new DictionaryEntry("name", m_Name),
+                                                        new DictionaryEntry("location", "{0:R}, {1:R}".Args(Lat, Lng)));
+      }
+      else
+      {
+        JsonWriter.WriteMap(wri, nestingLevel, options, new DictionaryEntry("name", m_Name),
+                                                        new DictionaryEntry("location", "{0}, {1}".Args(ComponentToString(Lat), ComponentToString(Lng))));
+      }
     }
 
 
